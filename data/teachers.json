@@ -1,0 +1,16 @@
+[
+    {
+        "teacher_id": "T200",
+        "name": "Abdullah",
+        "assigned_courses": [
+            "PYT303"
+        ]
+    },
+    {
+        "teacher_id": "T201",
+        "name": "S",
+        "assigned_courses": [
+            "CSS305"
+        ]
+    }
+]

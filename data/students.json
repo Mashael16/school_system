@@ -1,0 +1,22 @@
+[
+    {
+        "student_id": "S100",
+        "student_name": "Mashael",
+        "student_age": 23,
+        "enrolled_course": []
+    },
+    {
+        "student_id": "S101",
+        "student_name": "Sara",
+        "student_age": 22,
+        "enrolled_course": [
+            "JAV304"
+        ]
+    },
+    {
+        "student_id": "S102",
+        "student_name": "Yara",
+        "student_age": 32,
+        "enrolled_course": []
+    }
+]
