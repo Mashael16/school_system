@@ -2,6 +2,7 @@
     {
         "teacher_id": "T200",
         "name": "Abdullah",
+        "subject": "Not specified",
         "assigned_courses": [
             "PYT303"
         ]
@@ -9,8 +10,15 @@
     {
         "teacher_id": "T201",
         "name": "S",
+        "subject": "Not specified",
         "assigned_courses": [
             "CSS305"
         ]
+    },
+    {
+        "teacher_id": "T202",
+        "name": "Fahad",
+        "subject": "python",
+        "assigned_courses": []
     }
 ]
