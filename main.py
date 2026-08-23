@@ -59,6 +59,7 @@ def load_teachers(school):
         for teacher_data in loaded_teachers:
             teacher = Teacher(
                 name=teacher_data["name"],
+                subject=teacher_data.get("subject", "Not specified"),
                 teacher_id=teacher_data["teacher_id"]
             )
 
@@ -262,7 +263,7 @@ def main():
 
             student = Student(name,age)
 
-            success, message = my_school.add_student(student)
+            message = my_school.add_student(student)
 
             print(message)
 
@@ -273,7 +274,7 @@ def main():
 
             course = Course(course_name)
 
-            success, message = my_school.add_course(course)
+            message = my_school.add_course(course)
 
             print(message)
             print(f"Course Code: {course.course_code}")
@@ -281,10 +282,11 @@ def main():
         elif choice == 3:
 
             name = validate_text( "Enter teacher name: ")
+            
+            subject = validate_general_text("Enter subject taught: ")
+            teacher = Teacher(name, subject)
 
-            teacher = Teacher(name)
-
-            success, message = my_school.add_teacher(teacher)
+            message = my_school.add_teacher(teacher)
 
             print(message)
             print(f"Teacher ID: {teacher.teacher_id}")
