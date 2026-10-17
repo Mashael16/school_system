@@ -179,4 +179,4 @@ python main.py
 ## 👩‍💻 Author
 
 **Mashael** · Tuwaiq Academy, Python & Django Bootcamp
-[GitHub](https://github.com/Mashael16) · [LinkedIn](https://www.linkedin.com/in/your-profile)
+[GitHub](https://github.com/Mashael16) · [LinkedIn](https://www.linkedin.com/in/mashael-alharbi-0b42822ab/)
