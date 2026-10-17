@@ -1,0 +1,104 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Courses{% endblock %}
+
+{% block page_head %}
+<section class="page-head">
+    <div class="wrap">
+        <h1>Courses</h1>
+        <p>{{ courses|length }} course{{ courses|length|pluralize }} offered</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_class %}overlap{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <h2 class="panel-title">Add a course</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_course">
+            <label class="field">
+                <span>Course name</span>
+                <input type="text" name="course_name" placeholder="e.g. Python Basics" required>
+            </label>
+            <button type="submit">Add course</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2 class="panel-title">Assign a teacher</h2>
+        {% if teachers and courses %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="assign_teacher">
+                <label class="field">
+                    <span>Teacher</span>
+                    <select name="teacher_id" required>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.teacher_id }}">
+                                {{ teacher.name }} ({{ teacher.subject }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Course</span>
+                    <select name="course_code" required>
+                        {% for course in courses %}
+                            <option value="{{ course.course_code }}">
+                                {{ course.course_code }} · {{ course.course_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button type="submit">Assign teacher</button>
+            </form>
+        {% else %}
+            <p class="muted">Add at least one teacher and one course to assign teachers.</p>
+        {% endif %}
+    </section>
+
+    {% if rows %}
+        <table>
+            <tr><th>Code</th><th>Course</th><th>Teacher</th><th>Students</th><th></th></tr>
+            {% for row in rows %}
+                <tr>
+                    <td><span class="id">{{ row.course.course_code }}</span></td>
+                    <td><strong>{{ row.course.course_name }}</strong></td>
+                    <td>
+                        {% if row.teacher %}
+                            <span class="person">
+                                <span class="avatar">{{ row.teacher.name|first }}</span>
+                                {{ row.teacher.name }}
+                            </span>
+                        {% else %}
+                            <span class="muted">No teacher yet</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% with count=row.course.enrolled_student_ids|length %}
+                            {% if count %}
+                                <span class="chip">{{ count }} student{{ count|pluralize }}</span>
+                            {% else %}
+                                <span class="muted">None yet</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td class="actions">
+                        <form method="POST" action="{% url 'delete_course' row.course.course_code %}"
+                              class="js-confirm-delete"
+                              data-name="{{ row.course.course_name }}"
+                              data-detail="It will be removed from every student and teacher.">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="empty">No courses yet. Add the first one with the form above.</p>
+    {% endif %}
+{% endblock %}

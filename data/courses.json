@@ -1,22 +1,11 @@
 [
     {
-        "course_name": "python",
-        "course_code": "PYT303",
-        "assigned_teacher": "T200",
-        "enrolled_student_ids": []
-    },
-    {
-        "course_name": "java",
-        "course_code": "JAV304",
-        "assigned_teacher": null,
+        "course_name": "Computer",
+        "course_code": "COM6308",
+        "assigned_teacher": "T205",
         "enrolled_student_ids": [
-            "S101"
+            "S108",
+            "S109"
         ]
-    },
-    {
-        "course_name": "css",
-        "course_code": "CSS305",
-        "assigned_teacher": "T201",
-        "enrolled_student_ids": []
     }
 ]

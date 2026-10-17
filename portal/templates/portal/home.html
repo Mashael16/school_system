@@ -1,0 +1,55 @@
+{% extends "portal/base.html" %}
+
+{% block title %}{{ school.name }}{% endblock %}
+
+{% block hero %}
+<section class="road-hero">
+    <div class="wrap road-hero-inner">
+        <div class="road-hero-copy">
+            <h1>The best way to follow every student's journey</h1>
+            <p>Manage students, teachers, courses and enrollments in one simple place.</p>
+            <div class="road-hero-actions">
+                <a class="btn-road" href="{% url 'enrollment' %}">Get started <span aria-hidden="true">&rarr;</span></a>
+                <a class="btn-road-ghost" href="{% url 'student_list' %}">Learn more</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+
+    <div class="stats">
+        <div class="stat">
+            <span class="stat-number">{{ student_count }}</span>
+            <span class="stat-label">Students</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">{{ teacher_count }}</span>
+            <span class="stat-label">Teachers</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">{{ course_count }}</span>
+            <span class="stat-label">Courses</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">{{ enrollment_count }}</span>
+            <span class="stat-label">Enrollments</span>
+        </div>
+    </div>
+
+    <div class="tiles">
+        <a class="tile tile-students" href="{% url 'student_list' %}">
+            <span class="tile-image"></span>
+            <span class="tile-label">Students</span>
+        </a>
+        <a class="tile tile-teachers" href="{% url 'teacher_list' %}">
+            <span class="tile-image"></span>
+            <span class="tile-label">Teachers</span>
+        </a>
+        <a class="tile tile-courses" href="{% url 'course_list' %}">
+            <span class="tile-image"></span>
+            <span class="tile-label">Courses</span>
+        </a>
+    </div>
+{% endblock %}

@@ -1,24 +1,10 @@
 [
     {
-        "teacher_id": "T200",
-        "name": "Abdullah",
-        "subject": "Not specified",
+        "teacher_id": "T205",
+        "name": "Mashael",
+        "subject": "Computer",
         "assigned_courses": [
-            "PYT303"
+            "COM6308"
         ]
-    },
-    {
-        "teacher_id": "T201",
-        "name": "S",
-        "subject": "Not specified",
-        "assigned_courses": [
-            "CSS305"
-        ]
-    },
-    {
-        "teacher_id": "T202",
-        "name": "Fahad",
-        "subject": "python",
-        "assigned_courses": []
     }
 ]

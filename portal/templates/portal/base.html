@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Home{% endblock %} | Masar</title>
+    <link rel="icon" type="image/png" href="{% static 'portal/img/favicon.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'portal/style.css' %}?v=21">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="wrap header-inner">
+            <a class="logo" href="{% url 'home' %}">
+                <img src="{% static 'portal/img/masar-mark.png' %}" alt="">
+            </a>
+
+            <nav class="main-nav">
+                {% with name=request.resolver_match.url_name %}
+                    <a href="{% url 'home' %}" {% if name == 'home' %}class="active"{% endif %}>Home</a>
+                    <a href="{% url 'student_list' %}" {% if name == 'student_list' %}class="active"{% endif %}>Students</a>
+                    <a href="{% url 'teacher_list' %}" {% if name == 'teacher_list' %}class="active"{% endif %}>Teachers</a>
+                    <a href="{% url 'course_list' %}" {% if name == 'course_list' %}class="active"{% endif %}>Courses</a>
+                {% endwith %}
+            </nav>
+
+            <a class="btn-cta" href="{% url 'enrollment' %}">Enroll a student</a>
+        </div>
+    </header>
+
+    <main>
+        {% block hero %}
+        {% endblock %}
+        {% block page_head %}{% endblock %}
+
+        <div class="wrap page {% block page_class %}{% endblock %}">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">Masar | Built with Python and Django</div>
+    </footer>
+
+    <!-- One shared confirmation window for every Delete button on the site -->
+    <dialog id="confirm-modal" class="modal" aria-labelledby="modal-title">
+        <div class="modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>
+            </svg>
+        </div>
+        <h2 class="modal-title" id="modal-title">Delete <span data-modal-name></span>?</h2>
+        <p class="modal-text" data-modal-detail></p>
+        <p class="modal-warning">This can't be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-ghost" data-modal-cancel>Cancel</button>
+            <button type="button" class="btn-danger" data-modal-confirm>Yes, delete</button>
+        </div>
+    </dialog>
+
+    <script>
+        // Every form with class "js-confirm-delete" opens the window instead of
+        // submitting straight away. The form is only sent if the user confirms.
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("confirm-modal");
+            const nameEl = modal.querySelector("[data-modal-name]");
+            const detailEl = modal.querySelector("[data-modal-detail]");
+            let pendingForm = null;
+
+            document.querySelectorAll("form.js-confirm-delete").forEach(function (form) {
+                form.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    pendingForm = form;
+                    nameEl.textContent = form.dataset.name;
+                    detailEl.textContent = form.dataset.detail || "";
+                    modal.showModal();
+                });
+            });
+
+            modal.querySelector("[data-modal-cancel]").addEventListener("click", function () {
+                modal.close();
+            });
+
+            modal.querySelector("[data-modal-confirm]").addEventListener("click", function () {
+                if (pendingForm) pendingForm.submit();
+            });
+
+            // Clicking the dark area around the window also cancels.
+            modal.addEventListener("click", function (event) {
+                if (event.target === modal) modal.close();
+            });
+        });
+    </script>
+</body>
+</html>

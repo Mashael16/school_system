@@ -1,0 +1,68 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Students{% endblock %}
+
+{% block page_head %}
+<section class="page-head">
+    <div class="wrap">
+        <h1>Students</h1>
+        <p>{{ students|length }} student{{ students|length|pluralize }} registered</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_class %}overlap{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <h2 class="panel-title">Add a student</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label class="field">
+                <span>Full name</span>
+                <input type="text" name="name" placeholder="e.g. Sara Ali" required>
+            </label>
+            <label class="field field-sm">
+                <span>Age</span>
+                <input type="number" name="age" placeholder="5–100" min="5" max="100" required>
+            </label>
+            <button type="submit">Add student</button>
+        </form>
+    </section>
+
+    {% if students %}
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Age</th><th>Courses</th><th></th></tr>
+            {% for student in students %}
+                <tr>
+                    <td><span class="id">{{ student.student_id }}</span></td>
+                    <td>
+                        <span class="person">
+                            <span class="avatar">{{ student.name|first }}</span>
+                            {{ student.name }}
+                        </span>
+                    </td>
+                    <td>{{ student.age }}</td>
+                    <td>
+                        {% for code in student.enrolled_course %}
+                            <span class="chip">{{ code }}</span>
+                        {% empty %}
+                            <span class="muted">Not enrolled</span>
+                        {% endfor %}
+                    </td>
+                    <td class="actions">
+                        <form method="POST" action="{% url 'delete_student' student.student_id %}"
+                              class="js-confirm-delete"
+                              data-name="{{ student.name }}"
+                              data-detail="They will also be removed from all their courses.">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="empty">No students yet. Add the first one with the form above.</p>
+    {% endif %}
+{% endblock %}

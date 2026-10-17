@@ -1,0 +1,93 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Enrollment{% endblock %}
+
+{% block page_head %}
+<section class="page-head">
+    <div class="wrap">
+        <h1>Enrollment</h1>
+        <p>{{ enrollments|length }} active enrollment{{ enrollments|length|pluralize }}</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_class %}overlap{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <h2 class="panel-title">Enroll a student</h2>
+        {% if students and courses %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="enroll">
+                <label class="field">
+                    <span>Student</span>
+                    <select name="student_id" required>
+                        {% for student in students %}
+                            <option value="{{ student.student_id }}">
+                                {{ student.name }} ({{ student.student_id }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Course</span>
+                    <select name="course_code" required>
+                        {% for course in courses %}
+                            <option value="{{ course.course_code }}">
+                                {{ course.course_code }} · {{ course.course_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button type="submit">Enroll student</button>
+            </form>
+        {% else %}
+            <p class="muted">Add at least one student and one course first.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2 class="panel-title">Drop a student</h2>
+        {% if enrollments %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="drop">
+                <label class="field">
+                    <span>Enrollment</span>
+                    <select name="enrollment" required>
+                        {% for item in enrollments %}
+                            <option value="{{ item.student.student_id }}|{{ item.course.course_code }}">
+                                {{ item.student.name }} · {{ item.course.course_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button type="submit">Drop student</button>
+            </form>
+        {% else %}
+            <p class="muted">No enrollments yet.</p>
+        {% endif %}
+    </section>
+
+    {% if course_rows %}
+        <table>
+            <tr><th>Code</th><th>Course</th><th>Enrolled students</th></tr>
+            {% for row in course_rows %}
+                <tr>
+                    <td><span class="id">{{ row.course.course_code }}</span></td>
+                    <td><strong>{{ row.course.course_name }}</strong></td>
+                    <td>
+                        {% for student in row.students %}
+                            <span class="chip">{{ student.name }}</span>
+                        {% empty %}
+                            <span class="muted">No students yet</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="empty">No courses yet. Add one on the Courses page.</p>
+    {% endif %}
+{% endblock %}

@@ -1,3 +1,11 @@
+"""
+School Management System - entry point.
+
+Runs a menu-driven console application for managing students, teachers,
+and courses. Data is loaded from JSON files in the data/ folder at startup
+and written back when the user chooses "Save and Exit".
+"""
+
 import json
 from models.school import School
 from models.teacher import Teacher 
@@ -8,9 +16,17 @@ from utils.file_handler import read_file , update_file
 from utils.validators import validate_text , validate_age , validate_general_text ,validate_menu_choice
 from utils.logging import log_error
 
-#load student 
+
+# ---------------------------------------------------------------------------
+# Loading data
+# ---------------------------------------------------------------------------
 
 def load_students(school):
+    """Load saved students from data/students.json into the school.
+
+    Also advances Student.counter_student_id past the highest saved ID,
+    so new students never reuse an existing ID.
+    """
     try:
         loaded_students = read_file("data/students.json")
 
@@ -28,12 +44,14 @@ def load_students(school):
 
             school.add_student(student)
 
+            # IDs look like "S105": skip the prefix letter and keep the number.
             number = int(student.student_id[1:])
 
             if number >= Student.counter_student_id:
                 Student.counter_student_id = number + 1
 
     except FileNotFoundError:
+        # First run: no saved file yet, which is not an error for the user.
         print("No student data found. Starting fresh.")
         log_error("students.json not found.")
 
@@ -46,13 +64,16 @@ def load_students(school):
         log_error(f"Missing student field: {error}")
 
     except Exception as error:
+        # Safety net so a bad file never crashes the program at startup.
         print(f"Error loading students: {error}")
         log_error(f"Unexpected student loading error: {error}")
 
 
-#load teacher
-
 def load_teachers(school):
+    """Load saved teachers from data/teachers.json into the school.
+
+    Also advances Teacher.counter_teacher_id past the highest saved ID.
+    """
     try:
         loaded_teachers = read_file("data/teachers.json")
 
@@ -69,6 +90,7 @@ def load_teachers(school):
 
             school.add_teacher(teacher)
 
+            # IDs look like "T203": skip the prefix letter and keep the number.
             number = int(teacher.teacher_id[1:])
 
             if number >= Teacher.counter_teacher_id:
@@ -91,9 +113,12 @@ def load_teachers(school):
         log_error(f"Unexpected teacher loading error: {error}")
 
 
-
-#load courses
 def load_courses(school):
+    """Load saved courses from data/courses.json into the school.
+
+    Also advances Course.counter_course_code past the highest saved
+    code number, so newly generated codes stay unique.
+    """
     try:
         loaded_courses = read_file("data/courses.json")
         for course_data in loaded_courses:
@@ -111,6 +136,8 @@ def load_courses(school):
 
             school.add_course(course)
 
+            # Course codes have a variable-length prefix (e.g. "MAT301"),
+            # so read the trailing digits from the end instead of slicing.
             code = course.course_code
 
             digits = ""
@@ -126,7 +153,6 @@ def load_courses(school):
 
                 if number >= Course.counter_course_code:
                     Course.counter_course_code = number + 1
-
 
     except FileNotFoundError:
         print("No course data found. Starting fresh.")
@@ -144,8 +170,13 @@ def load_courses(school):
         print(f"Error loading courses: {error}")
         log_error(f"Unexpected course loading error: {error}")
 
-#save student 
+
+# ---------------------------------------------------------------------------
+# Saving data
+# ---------------------------------------------------------------------------
+
 def save_students(school):
+    """Write all students to data/students.json, replacing its contents."""
     student_data = []
 
     for student in school.students.values():
@@ -155,10 +186,8 @@ def save_students(school):
         "data/students.json", student_data)
 
 
-
-#save teacher 
-
 def save_teachers(school):
+    """Write all teachers to data/teachers.json, replacing its contents."""
     teacher_data = []
 
     for teacher in school.teachers.values():
@@ -167,8 +196,9 @@ def save_teachers(school):
     update_file(
         "data/teachers.json",teacher_data)
 
-#save course
+
 def save_courses(school):
+    """Write all courses to data/courses.json, replacing its contents."""
     course_data = []
 
     for course in school.courses.values():
@@ -178,8 +208,9 @@ def save_courses(school):
         "data/courses.json",
         course_data)
 
-#save all 
+
 def save_all_data(school):
+    """Save students, teachers, and courses, reporting any failure."""
     try:
         save_students(school)
         save_teachers(school)
@@ -191,9 +222,13 @@ def save_all_data(school):
         print(f"Error while saving data: {error}")
         log_error(f"Saving error: {error}")
 
-#menu
+
+# ---------------------------------------------------------------------------
+# User interface
+# ---------------------------------------------------------------------------
 
 def display_menu():
+    """Print the main menu options."""
 
     print("\n" + "=" * 50)
     print("        SCHOOL MANAGEMENT SYSTEM")
@@ -214,8 +249,9 @@ def display_menu():
 
     print("=" * 50)
 
-#main
+
 def main():
+    """Set up the school, load saved data, and run the menu loop."""
     print("\nSystem Setup")
     print("-" * 30)
 
@@ -237,60 +273,66 @@ def main():
         f"Management System!"
     )
 
-   
-
-    #load
+    # Restore data from the previous session before showing the menu.
     load_students(my_school)
     load_teachers(my_school)
     load_courses(my_school)
 
-   
-
-   
-    #display
+    # Main loop: runs until the user chooses "Save and Exit".
     while True:
         display_menu()
         choice = validate_menu_choice(
             "Choose an option: ",
-            1,#min mune
-            12#max mune
+            1,   # first menu option
+            12   # last menu option
         )
-        #add student
+
+        # IDs and course codes are upper-cased below so that user input
+        # like "s101" still matches the stored "S101".
+
+        # 1. Add student
         if choice == 1 :
             name = validate_text("Enter student name: ")
 
             age = validate_age("Enter student age: ")
 
             student = Student(name,age)
-
-            message = my_school.add_student(student)
+            
+            success, message = my_school.add_student(student)
 
             print(message)
+            if success:
+                print(f"Student ID: {student.student_id}")
 
-        #add course
+        # 2. Add course
         elif choice == 2:
 
             course_name = validate_general_text("Enter course name: ")
 
             course = Course(course_name)
 
-            message = my_school.add_course(course)
+            success, message = my_school.add_course(course)
 
             print(message)
-            print(f"Course Code: {course.course_code}")
-        #add teacher
+            if success:
+                print(f"Course Code: {course.course_code}")
+
+        # 3. Add teacher
         elif choice == 3:
 
             name = validate_text( "Enter teacher name: ")
             
             subject = validate_general_text("Enter subject taught: ")
+            
             teacher = Teacher(name, subject)
 
-            message = my_school.add_teacher(teacher)
+            success, message = my_school.add_teacher(teacher)
 
             print(message)
-            print(f"Teacher ID: {teacher.teacher_id}")
-        #assign teacher
+            if success:
+                print(f"Teacher ID: {teacher.teacher_id}")
+
+        # 4. Assign teacher to course
         elif choice == 4:
 
             teacher_id = validate_general_text("Enter teacher ID: ").upper()
@@ -300,7 +342,8 @@ def main():
             message = my_school.assign_teacher_to_course(teacher_id,course_code)
 
             print(message)
-        #enroll
+
+        # 5. Enroll student in course
         elif choice == 5:
 
             student_id = validate_general_text("Enter student ID: ").upper()
@@ -311,8 +354,7 @@ def main():
 
             print(message)
 
-
-        #drop
+        # 6. Drop student from course
         elif choice == 6:
 
             student_id = validate_general_text(
@@ -329,36 +371,39 @@ def main():
             )
 
             print(message)
-        #view student
+
+        # 7. View all students
         elif choice == 7:
 
             print("\n--- STUDENTS ---")
 
             my_school.display_students()
-        #view courses
+
+        # 8. View all courses
         elif choice == 8:
 
             print("\n--- COURSES ---")
 
             my_school.display_courses()
-        #view teachers
+
+        # 9. View all teachers
         elif choice == 9:
             print("\n--- TEACHERS ---")
             my_school.display_teachers()
 
-        #view stuednt courses
+        # 10. View courses of one student
         elif choice == 10:
 
             student_id = validate_general_text("Enter student ID: ").upper()
             my_school.display_student_courses(student_id)
 
-        #view course students
+        # 11. View students of one course
         elif choice == 11:
 
             course_code = validate_general_text("Enter course code: ").upper()
             my_school.display_course_students( course_code )
 
-        #  save and exit
+        # 12. Save and exit
         elif choice == 12:
 
             print("\nSaving data...")
@@ -373,4 +418,3 @@ def main():
 
 if __name__ == "__main__":
     main()
- 

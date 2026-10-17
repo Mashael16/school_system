@@ -1,0 +1,68 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Teachers{% endblock %}
+
+{% block page_head %}
+<section class="page-head">
+    <div class="wrap">
+        <h1>Teachers</h1>
+        <p>{{ teachers|length }} teacher{{ teachers|length|pluralize }} on staff</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_class %}overlap{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <h2 class="panel-title">Add a teacher</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label class="field">
+                <span>Full name</span>
+                <input type="text" name="name" placeholder="e.g. Fahad Saleh" required>
+            </label>
+            <label class="field">
+                <span>Subject</span>
+                <input type="text" name="subject" placeholder="e.g. Python" required>
+            </label>
+            <button type="submit">Add teacher</button>
+        </form>
+    </section>
+
+    {% if teachers %}
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Subject</th><th>Courses</th><th></th></tr>
+            {% for teacher in teachers %}
+                <tr>
+                    <td><span class="id">{{ teacher.teacher_id }}</span></td>
+                    <td>
+                        <span class="person">
+                            <span class="avatar">{{ teacher.name|first }}</span>
+                            {{ teacher.name }}
+                        </span>
+                    </td>
+                    <td>{{ teacher.subject }}</td>
+                    <td>
+                        {% for code in teacher.assigned_courses %}
+                            <span class="chip">{{ code }}</span>
+                        {% empty %}
+                            <span class="muted">No courses yet</span>
+                        {% endfor %}
+                    </td>
+                    <td class="actions">
+                        <form method="POST" action="{% url 'delete_teacher' teacher.teacher_id %}"
+                              class="js-confirm-delete"
+                              data-name="{{ teacher.name }}"
+                              data-detail="Their courses will be left without a teacher.">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="empty">No teachers yet. Add the first one with the form above.</p>
+    {% endif %}
+{% endblock %}
