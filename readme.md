@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/masar-logo.png" alt="Masar logo" width="140">
+  <img src="docs/screenshots/masar-logo.png" alt="Masar logo" width="140">
 </p>
 
 <h1 align="center">Masar · مَسار</h1>
